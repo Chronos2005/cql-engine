@@ -1,0 +1,73 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           PLC-Coursework
+version:        0.1.0.0
+description:    Alex and Happy project.
+homepage:       https://github.com/githubuser/PLC-Coursework#readme
+bug-reports:    https://github.com/githubuser/PLC-Coursework/issues
+author:         Ross Aiden Melo
+maintainer:     rossmelo2005@gmail.com
+copyright:      2025 Ross Aiden Melo, University of Southampton
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/PLC-Coursework
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_PLC_Coursework
+  autogen-modules:
+      Paths_PLC_Coursework
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      array
+    , base >=4.7 && <5
+  default-language: Haskell2010
+  build-tool-depends:
+    alex:alex,
+    happy:happy
+
+executable PLC-Coursework-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_PLC_Coursework
+  autogen-modules:
+      Paths_PLC_Coursework
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      PLC-Coursework
+    , array
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite PLC-Coursework-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_PLC_Coursework
+  autogen-modules:
+      Paths_PLC_Coursework
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      PLC-Coursework
+    , array
+    , base >=4.7 && <5
+  default-language: Haskell2010
