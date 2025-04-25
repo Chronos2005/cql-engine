@@ -68,9 +68,9 @@ executeQuery query env =
                 (selectClause query)) filteredRows
         
         -- Apply ORDER BY clause if present
-        sortedRows = case orderByClause query of
-            [] -> selectedRows
-            orderItems -> sortRows orderItems selectedRows env
+        sortedRows
+          | null (orderByClause query) = sort selectedRows
+          | otherwise                  = sortRows (orderByClause query) selectedRows env
     in
         sortedRows
 
