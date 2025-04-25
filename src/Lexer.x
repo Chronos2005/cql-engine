@@ -41,6 +41,7 @@ tokens :-
   -- Identifiers and literals
   $alpha [$alphaNum \_ \']*           { \p s -> TokenIdentifier p s }
   $digit+                             { \p s -> TokenInt p (read s) }
+  \"[^\"]*\"                        { \p s -> TokenString p (init (tail s)) }  -- String literals in double quotes
  
 
   -- Operators and delimiters
