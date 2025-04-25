@@ -1,6 +1,6 @@
 name:       PLC-Coursework
 version:    0.1.0.0
-github:     "githubuser/PLC-Coursework"
+github:     "Chronos2005/PLC-Coursework"
 license:    BSD-3-Clause
 author:     "Ross Aiden Melo"
 maintainer: "rossmelo2005@gmail.com"
@@ -19,6 +19,8 @@ description: Alex and Happy project.
 dependencies:
 - base >= 4.7 && < 5
 - array
+- containers
+- csv
 
 ghc-options:
 - -Wall
@@ -59,3 +61,8 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - PLC-Coursework
+    - hspec
+    - process
+    - temporary
+    - filepath
+    - text

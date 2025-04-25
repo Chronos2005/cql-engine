@@ -1,0 +1,3 @@
+  FROM A
+  WHERE A.1 == A.2
+  SELECT A.3, A.1
