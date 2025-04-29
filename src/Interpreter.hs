@@ -8,6 +8,7 @@ import Data.Maybe
 import Control.Monad
 import Text.CSV
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 -- Type alias for CSV data
 type CSVData = [[String]]
@@ -15,14 +16,25 @@ type CSVData = [[String]]
 -- Type alias for environment (mapping source names to their data)
 type Env = Map.Map String CSVData
 
--- Read a CSV file with the given name
+-- Read a CSV file with the given name; treat every line as a row, splitting on commas
 readCSVFile :: String -> IO CSVData
 readCSVFile name = do
-    let filename = name ++ ".csv"
+    let filename = "./" ++ name ++ ".csv"
     content <- readFile filename
-    case parseCSV filename content of
-        Left err -> error $ "Error parsing CSV file: " ++ show err
-        Right csv -> return $ map (map trimWhitespace) csv
+    let rows    = lines content
+        records = map (map trimWhitespace . splitCommas) rows
+    return records
+
+-- Simple CSV split (no support for quoted commas)
+splitCommas :: String -> [String]
+splitCommas [] = [""]
+splitCommas s  = go s
+  where
+    go str =
+      let (field, rest) = break (== ',') str in
+      case rest of
+        []     -> [field]
+        (_:xs) -> field : go xs
 
 -- Trim leading and trailing whitespace from a string
 trimWhitespace :: String -> String
@@ -32,14 +44,19 @@ trimWhitespace = reverse . dropWhile isWhitespace . reverse . dropWhile isWhites
 -- Main interpret function
 interpret :: Query -> IO ()
 interpret query = do
-    -- Read all source files
-    env <- loadSources (fromSources query)
+    -- Read CSV files
+    env0 <- loadSources (fromSources query)
     
-    -- Execute the query
+    -- Pad environment
+    let env = padEnv query env0
+
+    -- Execute query
     let result = executeQuery query env
     
-    -- Output the result
+    -- Output CSV
     putStr $ formatCSV result
+
+
 
 -- Load all sources mentioned in the query
 loadSources :: [Source] -> IO Env
@@ -184,3 +201,47 @@ runQuery input = do
     let tokens = alexScanTokens input
     let queryAst = parse tokens
     interpret queryAst
+
+
+
+-- Pad each table's rows so every row has enough columns
+padEnv :: Query -> Env -> Env
+padEnv query env =
+    let needed = maxIndices query
+    in Map.mapWithKey (padTable needed) env
+
+-- Pad one table's rows
+padTable :: Map.Map String Int -> String -> CSVData -> CSVData
+padTable needed tableName rows =
+    case Map.lookup tableName needed of
+        Nothing -> rows  -- No columns needed for this table
+        Just maxIdx -> map (padRow maxIdx) rows
+
+-- Pad one row to required number of columns
+padRow :: Int -> [String] -> [String]
+padRow n xs
+    | length xs >= n = xs
+    | otherwise      = xs ++ replicate (n - length xs) ""
+
+-- Find the maximum column index needed for each table
+maxIndices :: Query -> Map.Map String Int
+maxIndices (Query froms mWhere selects orderBy) =
+    let exprs = concat
+          [ maybe [] pure mWhere
+          , map selectExpr selects
+          , map (orderExpr . fst) orderBy
+          ]
+        indices = concatMap extract exprs
+    in foldl insert Map.empty indices
+  where
+    insert m (table, idx) = Map.insertWith max table idx m
+
+-- Extract table + column references from an expression
+extract :: Expr -> [(String, Int)]
+extract expr = case expr of
+    ColumnRef table col -> [(table, read col)]
+    ColumnIndexRef table idx -> [(table, idx)]
+    BinaryOp _ e1 e2 -> extract e1 ++ extract e2
+    UnaryOp _ e -> extract e
+    FunctionCall _ args -> concatMap extract args
+    _ -> []
