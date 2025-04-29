@@ -127,7 +127,7 @@ parseError :: [Token] -> a
 parseError [] = error "Parse error: unexpected end of input"
 parseError (t:_) = error $ "Parse error at " ++ show (tokenPosn t)
 
--- Abstract Syntax Tree (AST) definitions
+
 data Query = Query {
     fromSources :: [Source],
     whereClause :: Maybe Expr,
