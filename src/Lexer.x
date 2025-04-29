@@ -19,24 +19,24 @@ tokens :-
  
 
   -- Keywords
-  FROM                                { \p s -> TokenFrom p }
-  WHERE                               { \p s -> TokenWhere p }
-  SELECT                              { \p s -> TokenSelect p }
-  AS                                  { \p s -> TokenAs p }
-  AND                                 { \p s -> TokenAnd p }
-  OR                                  { \p s -> TokenOr p }
-  NOT                                 { \p s -> TokenNot p }
-  ORDER                               { \p s -> TokenOrder p }
-  BY                                  { \p s -> TokenBy p }
-  ASC                                 { \p s -> TokenAsc p }
-  DESC                                { \p s -> TokenDesc p }
-  EMPTY                               { \p s -> TokenEmpty p }
-  EXISTS                              { \p s -> TokenExists p }
-  EQUALS                              { \p s -> TokenEquals p }
-  COALESCE                            { \p s -> TokenCoalesce p }
-  UNION                               { \p s -> TokenUnion p }
-  INTERSECT                           { \p s -> TokenIntersect p }
-  EXCEPT                              { \p s -> TokenExcept p }
+  FROM                                { \p _ -> TokenFrom p }
+  WHERE                               { \p _ -> TokenWhere p }
+  SELECT                              { \p _ -> TokenSelect p }
+  AS                                  { \p _ -> TokenAs p }
+  AND                                 { \p _ -> TokenAnd p }
+  OR                                  { \p _ -> TokenOr p }
+  NOT                                 { \p _ -> TokenNot p }
+  ORDER                               { \p _ -> TokenOrder p }
+  BY                                  { \p _ -> TokenBy p }
+  ASC                                 { \p _ -> TokenAsc p }
+  DESC                                { \p _ -> TokenDesc p }
+  EMPTY                               { \p _ -> TokenEmpty p }
+  EXISTS                              { \p _ -> TokenExists p }
+  EQUALS                              { \p _ -> TokenEquals p }
+  COALESCE                            { \p _ -> TokenCoalesce p }
+  UNION                               { \p _ -> TokenUnion p }
+  INTERSECT                           { \p _ -> TokenIntersect p }
+  EXCEPT                              { \p _ -> TokenExcept p }
 
   -- Identifiers and literals
   $alpha [$alphaNum \_ \']*           { \p s -> TokenIdentifier p s }
@@ -45,22 +45,22 @@ tokens :-
  
 
   -- Operators and delimiters
-  "=="                                { \p s -> TokenEq p }
-  "!="                                { \p s -> TokenNeq p }
-  "<"                                 { \p s -> TokenLt p }
-  "<="                                { \p s -> TokenLe p }
-  ">"                                 { \p s -> TokenGt p }
-  ">="                                { \p s -> TokenGe p }
-  "+"                                 { \p s -> TokenPlus p }
-  "-"                                 { \p s -> TokenMinus p }
-  "*"                                 { \p s -> TokenTimes p }
-  "/"                                 { \p s -> TokenDiv p }
-  "("                                 { \p s -> TokenLParen p }
-  ")"                                 { \p s -> TokenRParen p }
-  ","                                 { \p s -> TokenComma p }
-  "."                                 { \p s -> TokenDot p }
-  ";"                                 { \p s -> TokenSemicolon p }
-  ":"                                 { \p s -> TokenColon p }
+  "=="                                { \p _ -> TokenEq p }
+  "!="                                { \p _ -> TokenNeq p }
+  "<"                                 { \p _ -> TokenLt p }
+  "<="                                { \p _ -> TokenLe p }
+  ">"                                 { \p _ -> TokenGt p }
+  ">="                                { \p _ -> TokenGe p }
+  "+"                                 { \p _ -> TokenPlus p }
+  "-"                                 { \p _ -> TokenMinus p }
+  "*"                                 { \p _ -> TokenTimes p }
+  "/"                                 { \p _ -> TokenDiv p }
+  "("                                 { \p _ -> TokenLParen p }
+  ")"                                 { \p _ -> TokenRParen p }
+  ","                                 { \p _ -> TokenComma p }
+  "."                                 { \p _ -> TokenDot p }
+  ";"                                 { \p _ -> TokenSemicolon p }
+  ":"                                 { \p _ -> TokenColon p }
   
 
 
