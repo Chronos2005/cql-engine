@@ -21,6 +21,11 @@ dependencies:
 - array
 - containers
 - csv
+- hspec
+- directory
+- silently
+- deepseq
+
 
 ghc-options:
 - -Wall
@@ -53,7 +58,7 @@ executables:
 
 tests:
   PLC-Coursework-test:
-    main:        Spec.hs
+    main:        Main.hs
     source-dirs: test
     ghc-options:
     - -threaded
@@ -61,8 +66,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - PLC-Coursework
-    - hspec
-    - process
-    - temporary
-    - filepath
-    - text
+    

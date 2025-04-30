@@ -212,10 +212,14 @@ padEnv query env =
 
 -- Pad one table's rows
 padTable :: Map.Map String Int -> String -> CSVData -> CSVData
-padTable needed tableName rows =
-    case Map.lookup tableName needed of
-        Nothing -> rows  -- No columns needed for this table
+padTable needed tableName rows
+    | all isTrulyEmpty rows = []
+    | otherwise = case Map.lookup tableName needed of
+        Nothing     -> rows
         Just maxIdx -> map (padRow maxIdx) rows
+  where
+    isTrulyEmpty row = all (== "") row
+
 
 -- Pad one row to required number of columns
 padRow :: Int -> [String] -> [String]
