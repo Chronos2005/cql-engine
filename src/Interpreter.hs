@@ -25,6 +25,11 @@ readCSVFile name = do
     evaluate (length content)
     let rows    = lines content
         records = map (map trimWhitespace . splitCommas) rows
+    -- 🚨 check for inconsistent arity
+    let colCounts = map length records
+    unless (null colCounts || all (== head colCounts) colCounts) $
+      throwIO (userError $
+        "Inconsistent arity in CSV “" ++ filename ++ "”: row-lengths = " ++ show colCounts)
     return records
 
 -- Simple CSV split (no support for quoted commas)
@@ -214,13 +219,11 @@ padEnv query env =
 
 -- Pad one table's rows
 padTable :: Map.Map String Int -> String -> CSVData -> CSVData
-padTable needed tableName rows
-    | all isTrulyEmpty rows = []
-    | otherwise = case Map.lookup tableName needed of
+padTable needed tableName rows =
+    case Map.lookup tableName needed of
         Nothing     -> rows
         Just maxIdx -> map (padRow maxIdx) rows
-  where
-    isTrulyEmpty row = all (== "") row
+
 
 
 -- Pad one row to required number of columns
