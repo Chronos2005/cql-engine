@@ -9,6 +9,7 @@ import Control.Monad
 import Text.CSV
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import Control.Exception
 
 -- Type alias for CSV data
 type CSVData = [[String]]
@@ -21,6 +22,7 @@ readCSVFile :: String -> IO CSVData
 readCSVFile name = do
     let filename = "./" ++ name ++ ".csv"
     content <- readFile filename
+    evaluate (length content)
     let rows    = lines content
         records = map (map trimWhitespace . splitCommas) rows
     return records
