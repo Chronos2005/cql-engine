@@ -23,7 +23,7 @@ readCSVFile name = do
     let filename = "./" ++ name ++ ".csv"
     content <- readFile filename
     evaluate (length content)
-    let rows    = lines content
+    let rows    = splitEverywhere '\n' content
         records = map (map trimWhitespace . splitCommas) rows
     -- 🚨 check for inconsistent arity
     let colCounts = map length records
@@ -220,9 +220,9 @@ padEnv query env =
 -- Pad one table's rows
 padTable :: Map.Map String Int -> String -> CSVData -> CSVData
 padTable needed tableName rows =
-    case Map.lookup tableName needed of
-        Nothing     -> rows
-        Just maxIdx -> map (padRow maxIdx) rows
+  case Map.lookup tableName needed of
+    Nothing     -> rows
+    Just maxIdx -> map (padRow maxIdx) rows
 
 
 
@@ -254,3 +254,15 @@ extract expr = case expr of
     UnaryOp _ e -> extract e
     FunctionCall _ args -> concatMap extract args
     _ -> []
+
+
+-- Splits on a delimiter but treats completely empty input as zero rows
+splitEverywhere :: Char -> String -> [String]
+splitEverywhere _    "" = []
+splitEverywhere delim s  = go s
+  where
+    go str =
+      let (fld, rest) = break (== delim) str in
+      case rest of
+        []     -> [fld]
+        (_:xs) -> fld : go xs
