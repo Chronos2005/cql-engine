@@ -57,14 +57,23 @@ import Control.Monad (liftM, ap)
 %left '*' '/'
 %right NOT
 %left '.'
+%left UNION INTERSECT EXCEPT
 
 %%
 
 -- Main program structure
-Query : FromClause WhereClause SelectClause OrderByClause  { Query $1 $2 $3 $4 }
-      | FromClause WhereClause SelectClause                { Query $1 $2 $3 [] }
-      | FromClause SelectClause                            { Query $1 Nothing $2 [] }
+Query
+    : SingleQuery             { $1 }
+    | Query UNION     Query  { Union     $1 $3 }
+    | Query INTERSECT Query  { Intersect $1 $3 }
+    | Query EXCEPT    Query  { Except    $1 $3 }
+    
 
+SingleQuery
+    : FromClause WhereClause SelectClause OrderByClause { BaseQuery $1 $2 $3 $4 }
+    | FromClause WhereClause SelectClause              { BaseQuery $1 $2 $3 [] }
+    | FromClause SelectClause                          { BaseQuery $1 Nothing $2 [] }
+    
 -- FROM clause specifies data sources
 FromClause : FROM SourceList                              { $2 }
 
@@ -128,12 +137,18 @@ parseError [] = error "Parse error: unexpected end of input"
 parseError (t:_) = error $ "Parse error at " ++ show (tokenPosn t)
 
 
-data Query = Query {
-    fromSources :: [Source],
-    whereClause :: Maybe Expr,
-    selectClause :: [SelectItem],
-    orderByClause :: [(OrderItem, Bool)]  -- Bool indicates ASC (True) or DESC (False)
-} deriving (Show, Eq)
+data Query
+  = BaseQuery
+      { fromSources   :: [Source]
+      , whereClause   :: Maybe Expr
+      , selectClause  :: [SelectItem]
+      , orderByClause :: [(OrderItem, Bool)]
+      }
+  | Union     Query Query
+  | Intersect Query Query
+  | Except    Query Query
+  deriving (Show,Eq)
+
 
 data Source = Source {
     sourceName :: String,

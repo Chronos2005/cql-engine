@@ -3,10 +3,7 @@ module Main (
   ) where
 
 
-import Lexer 
-import Parser
 import System.Environment (getArgs)
-import System.IO (readFile)
 import Interpreter
 
 main :: IO ()
