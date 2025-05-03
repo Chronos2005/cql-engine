@@ -48,7 +48,7 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
     it "With empty strings" $ do
       writeCSV "A.csv" ",\n1,"
       writeCSV "B.csv" "3,\n,4"
-      runTest "t1.cql" (unlines [",,3,",",,4","1,,3,","1,,4"])
+      runTest "t1.cql" (unlines [",,,4",",,3,","1,,,4","1,,3,"])
       clean ["A.csv", "B.csv"]
       
     it "With many rows" $ do
@@ -139,7 +139,7 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
       
     it "Only empty strings" $ do
       writeCSV "A.csv" "\n\n"
-      runTest "t4.cql" (unlines [",foo,",",foo,"])
+      runTest "t4.cql" (unlines [",foo,",",foo,", ",foo,"])
       clean ["A.csv"]
       
     it "Empty input" $ do
@@ -154,8 +154,9 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
       
     it "Special characters" $ do
       writeCSV "A.csv" "123\n!@#\n"
-      runTest "t4.cql" (unlines ["!@#,foo,!@#",",foo,","123,foo,123"])
-      clean ["A.csv"]
+      runTest "t4.cql" (unlines [",foo,"
+                                ,"!@#,foo,!@#"
+                               ,"123,foo,123"])
 
   describe "Task 5 - Left Merge on First Column" $ do
     it "Example 1 - Basic merge" $ do
@@ -180,9 +181,10 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
       writeCSV "P.csv" "1,5,4,\n1,9,8,7\n2,,2,"
       writeCSV "Q.csv" "1,6,4,7\n1,0,0,0\n2,8,5,3"
       runTest "t5.cql" (unlines [
-        "1,5,4,7","1,9,8,7",
-        "1,5,4,0","1,9,8,0",
-        "2,,2,3"])
+        "1,5,4,0","1,5,4,7",
+        "1,9,8,7","1,9,8,7",
+        "2,8,2,3"])
+
       clean ["P.csv", "Q.csv"]
       
     it "Empty P" $ do
@@ -200,7 +202,7 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
     it "All empty strings" $ do
       writeCSV "P.csv" ",,,"
       writeCSV "Q.csv" ",1,2,3"
-      runTest "t5.cql" (unlines [",,1,2,3"])
+      runTest "t5.cql" (unlines [",1,2,3"])
       clean ["P.csv", "Q.csv"]
       
     it "Empty strings in key position" $ do
