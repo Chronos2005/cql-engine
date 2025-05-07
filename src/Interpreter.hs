@@ -8,6 +8,8 @@ import Data.Maybe
 import Control.Monad
 import qualified Data.Map as Map
 import Control.Exception
+import System.IO.Error (catchIOError)
+import System.Exit     (exitFailure)
 
 -- Type alias for CSV data
 type CSVData = [[String]]
@@ -19,15 +21,26 @@ type Env = Map.Map String CSVData
 readCSVFile :: String -> IO CSVData
 readCSVFile name = do
     let filename = "./" ++ name ++ ".csv"
-    content <- readFile filename
+    content <- catchIOError (readFile filename) $ \_ -> do
+        putStrLn $ "Error: Cannot open CSV file '" ++ filename ++ "' check csv file name."
+        exitFailure
+
     evaluate (length content)
     let rows    = splitEverywhere '\n' content
         records = map (map trimWhitespace . splitCommas) rows
-    -- 🚨 check for inconsistent arity
+
+    --  check for inconsistent arity
     let colCounts = map length records
-    unless (null colCounts || all (== head colCounts) colCounts) $
-      throwIO (userError $
-        "Inconsistent arity in CSV “" ++ filename ++ "”: row-lengths = " ++ show colCounts)
+    case colCounts of
+      [] -> return ()   -- empty file is fine
+      (n:ns)
+        | all (== n) ns -> return ()
+        | otherwise     -> do
+            putStrLn $
+              "Error: Inconsistent number of columns in '" ++ filename
+              ++ "': row lengths = " ++ show colCounts
+            exitFailure
+
     return records
 
 -- Simple CSV split (no support for quoted commas)
