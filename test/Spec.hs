@@ -2,14 +2,12 @@
 
 module Spec (spec) where
 
-import Test.Hspec
-import System.IO (writeFile, hFlush, stdout)
+import Test.Hspec ( describe, it, shouldBe, Spec )
 import System.Directory (removeFile)
 import System.IO.Silently (capture_)
 import Interpreter
 import Control.DeepSeq (force)
 import Control.Exception (evaluate, catch, IOException)
-import Data.List (sort)
 
 spec :: Spec
 spec = describe "Coursework Tasks using actual tN.cql files" $ do
@@ -211,19 +209,19 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
       runTest "t5.cql" (unlines [",a,b,c"])
       clean ["P.csv", "Q.csv"]
 
---------------------------------------------------------------------------------
+
 
 -- Helper to write and flush CSV files
 writeCSV :: FilePath -> String -> IO ()
 writeCSV path content = do
   writeFile path content
-  --hFlush stdout
+
 
 runTest :: FilePath -> String -> IO ()
 runTest queryFile expectedOutput = do
   query <- readFile queryFile
   output <- capture_ (runQuery query)
-  evaluate (force output) >>= (`shouldBe` expectedOutput)  -- Fully force and compare before cleanup
+  evaluate (force output) >>= (`shouldBe` expectedOutput) 
 
 clean :: [FilePath] -> IO ()
 clean = mapM_ safeRemove
