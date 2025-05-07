@@ -75,7 +75,7 @@ SingleQuery
     | FromClause SelectClause OrderByClause             { BaseQuery $1 Nothing $2 $3 }
     | FromClause SelectClause                          { BaseQuery $1 Nothing $2 [] }
     
--- FROM clause specifies data sources
+
 FromClause : FROM SourceList                              { $2 }
 
 SourceList : Source                                        { [$1] }
@@ -84,10 +84,10 @@ SourceList : Source                                        { [$1] }
 Source : ident                                             { Source $1 $1 }
        | ident AS ident                                    { Source $1 $3 }
 
--- WHERE clause for filtering
+
 WhereClause : WHERE Expr                                   { Just $2 }
 
--- SELECT clause specifies output columns
+
 SelectClause : SELECT SelectItemList                       { $2 }
 
 SelectItemList : SelectItem                                { [$1] }
@@ -96,7 +96,7 @@ SelectItemList : SelectItem                                { [$1] }
 SelectItem : Expr                                          { SelectItem $1 Nothing }
           | Expr AS ident                                  { SelectItem $1 (Just $3) }
 
--- ORDER BY clause
+
 OrderByClause : ORDER BY OrderItemList                     { $3 }
 
 OrderItemList : OrderItem                                  { [$1] }
@@ -106,7 +106,7 @@ OrderItem : Expr                                           { (OrderItem $1, True
          | Expr ASC                                        { (OrderItem $1, True) }
          | Expr DESC                                       { (OrderItem $1, False) }
 
--- Expressions
+
 Expr : Term                                                { $1 }
      | Expr '==' Expr                                      { BinaryOp Eq $1 $3 }
      | Expr '!=' Expr                                      { BinaryOp Neq $1 $3 }
@@ -175,8 +175,8 @@ data Expr
     = BinaryOp BinOp Expr Expr
     | UnaryOp UnOp Expr
     | FunctionCall String [Expr]
-    | ColumnRef String String  -- table.column
-    | ColumnIndexRef String Int  -- table.index
+    | ColumnRef String String  
+    | ColumnIndexRef String Int  
     | Identifier String
     | StringLit String
     | IntLit Int

@@ -41,7 +41,7 @@ tokens :-
   -- Identifiers and literals
   $alpha [$alphaNum \_ \']*           { \p s -> TokenIdentifier p s }
   $digit+                             { \p s -> TokenInt p (read s) }
-  \"[^\"]*\"                        { \p s -> TokenString p (init (tail s)) }  -- String literals in double quotes
+  \"[^\"]*\"                        { \p s -> TokenString p (init (tail s)) }  
  
 
   -- Operators and delimiters
@@ -69,13 +69,13 @@ tokens :-
 {
 
 
--- Extract line and column from AlexPosn
+
 getLineCol :: AlexPosn -> (Int, Int)
 getLineCol (AlexPn _ line col) = (line, col)
 
 data PosnToken = PT AlexPosn Token deriving (Eq, Show)
 
--- The token type:
+
 data Token
   = TokenFrom AlexPosn
   | TokenWhere AlexPosn
@@ -116,7 +116,7 @@ data Token
   | TokenColon AlexPosn
   deriving (Eq, Show) 
 
--- Extract position from a token
+
 tokenPosn :: Token -> AlexPosn
 tokenPosn (TokenFrom p) = p
 tokenPosn (TokenWhere p) = p
@@ -157,7 +157,7 @@ tokenPosn (TokenSemicolon p) = p
 tokenPosn (TokenColon p) = p
 
 
--- Helper function for formatting error messages
+
 formatError :: Token -> String -> String  
 formatError token msg = let ( line, col) = getLineCol (tokenPosn token)
                        in "Error at line " ++ show line ++ ", column " ++ show col ++ ": " ++ msg

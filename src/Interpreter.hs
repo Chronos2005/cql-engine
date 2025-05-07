@@ -6,17 +6,17 @@ import Data.List ( intercalate, nub, sort, sortBy )
 import Data.Maybe ( fromMaybe )
 import Control.Monad ( forM )
 import qualified Data.Map as Map
-import Control.Exception
+import Control.Exception ( evaluate )
 import System.IO.Error (catchIOError)
 import System.Exit     (exitFailure)
 
--- Type alias for CSV data
+
 type CSVData = [[String]]
 
--- Type alias for environment (mapping source names to their data)
+
 type Env = Map.Map String CSVData
 
--- Read a CSV file with the given name; treat every line as a row, splitting on commas
+
 readCSVFile :: String -> IO CSVData
 readCSVFile name = do
     let filename = "./" ++ name ++ ".csv"
@@ -24,14 +24,14 @@ readCSVFile name = do
         putStrLn $ "Error: Cannot open CSV file '" ++ filename ++ "' check csv file name."
         exitFailure
 
-    evaluate (length content)
+    evaluate (length content) --Forces to read the file for testing
     let rows    = splitEverywhere '\n' content
         records = map (map trimWhitespace . splitCommas) rows
 
     --  check for inconsistent arity
     let colCounts = map length records
     case colCounts of
-      [] -> return ()   -- empty file is fine
+      [] -> return ()   
       (n:ns)
         | all (== n) ns -> return ()
         | otherwise     -> do
@@ -42,7 +42,7 @@ readCSVFile name = do
 
     return records
 
--- Simple CSV split (no support for quoted commas)
+
 splitCommas :: String -> [String]
 splitCommas [] = [""]
 splitCommas s  = go s
@@ -53,7 +53,7 @@ splitCommas s  = go s
         []     -> [field]
         (_:xs) -> field : go xs
 
--- Trim leading and trailing whitespace from a string
+
 trimWhitespace :: String -> String
 trimWhitespace = reverse . dropWhile isWhitespace . reverse . dropWhile isWhitespace
   where isWhitespace c = c `elem` " \t\n\r"
@@ -75,7 +75,7 @@ interpret query = do
 
 
 
--- Load all sources mentioned in the query
+
 loadSources :: [Source] -> IO Env
 loadSources sources = do
     pairs <- forM sources $ \source -> do
@@ -84,7 +84,7 @@ loadSources sources = do
         return (sourceAlias source, data')
     return $ Map.fromList pairs
 
--- Execute a query against the environment
+
 executeQuery :: Query -> Env -> CSVData
 executeQuery (Union q1 q2)     env = setUnion     (executeQuery q1 env) (executeQuery q2 env)
 executeQuery (Intersect q1 q2) env = setIntersect (executeQuery q1 env) (executeQuery q2 env)
@@ -111,14 +111,14 @@ executeQuery query env =
     in
         sortedRows
 
--- Generate all rows from cartesian product of sources
+
 cartesianProduct :: [Source] -> Env -> [[(String, String, Int, Int)]]
 cartesianProduct sources env =
     let
         sourcesWithData = map (\s ->
             (sourceAlias s, fromMaybe [] (Map.lookup (sourceAlias s) env))) sources
 
-        -- Generate initial state with just the first source
+        
         initialProduct = case sourcesWithData of
             [] -> []
             (alias, rows):_ ->
@@ -126,7 +126,7 @@ cartesianProduct sources env =
                   | (colIdx, cell) <- zip [1..] row ]
                 | (rowIdx, row) <- zip [1..] rows ]
 
-        -- Function to add one more source to the product
+       
         addSource prod (alias, rows) =
             [ row ++ [(alias, cell, rowIdx, colIdx)
                      | (colIdx, cell) <- zip [1..] sourceRow ]
@@ -135,7 +135,7 @@ cartesianProduct sources env =
     in
         foldl addSource initialProduct (drop 1 sourcesWithData)
 
--- Evaluate an expression to a boolean
+
 evalBoolExpr :: Expr -> [(String, String, Int, Int)] -> Env -> Bool
 evalBoolExpr expr row env =
     case expr of
@@ -151,7 +151,7 @@ evalBoolExpr expr row env =
         UnaryOp Exists e -> evalExprToString e row env /= ""
         _ -> error $ "Expression is not boolean: " ++ show expr
 
--- Evaluate an expression to a string
+
 evalExprToString :: Expr -> [(String, String, Int, Int)] -> Env -> String
 evalExprToString expr row env =
     case expr of
@@ -172,7 +172,7 @@ evalExprToString expr row env =
             let matches = filter (\(t, _, _, _) -> t == id) row
             in case matches of
                 (_, val, _, _):_ -> val
-                _ -> id  -- If not a column reference, treat as a literal
+                _ -> id  
 
         StringLit s -> s
 
@@ -235,7 +235,7 @@ evalOrderKey expr row _env =
     _ -> ""
 
 
--- Format CSV data as a string
+
 formatCSV :: CSVData -> String
 formatCSV = unlines . map (intercalate "," . map escapeCSV)
   where
@@ -250,13 +250,13 @@ runQuery input = do
 
 
 
--- Pad each table's rows so every row has enough columns
+
 padEnv :: Query -> Env -> Env
 padEnv query env =
     let needed = maxIndices query
     in Map.mapWithKey (padTable needed) env
 
--- Pad one table's rows
+
 padTable :: Map.Map String Int -> String -> CSVData -> CSVData
 padTable needed tableName rows =
   case Map.lookup tableName needed of
@@ -265,17 +265,17 @@ padTable needed tableName rows =
 
 
 
--- Pad one row to required number of columns
+
 padRow :: Int -> [String] -> [String]
 padRow n xs
     | length xs >= n = xs
     | otherwise      = xs ++ replicate (n - length xs) ""
 
 
--- Find the maximum column index needed for each table
+
 maxIndices :: Query -> Map.Map String Int
 
--- For a plain SELECT…FROM…WHERE…ORDER (our “BaseQuery”):
+
 maxIndices (BaseQuery froms mWhere selects orderBy) =
   let exprs = concat
         [ maybe [] pure mWhere
@@ -287,13 +287,12 @@ maxIndices (BaseQuery froms mWhere selects orderBy) =
     where
       insert m (table, idx) = Map.insertWith max table idx m
 
--- For UNION, INTERSECT, EXCEPT: combine requirements of both sides
 maxIndices (Union q1 q2)     = Map.unionWith max (maxIndices q1) (maxIndices q2)
 maxIndices (Intersect q1 q2) = Map.unionWith max (maxIndices q1) (maxIndices q2)
 maxIndices (Except q1 q2)    = Map.unionWith max (maxIndices q1) (maxIndices q2)
 
 
--- Extract table + column references from an expression
+
 extract :: Expr -> [(String, Int)]
 extract expr = case expr of
     ColumnRef table col -> [(table, read col)]
@@ -304,7 +303,7 @@ extract expr = case expr of
     _ -> []
 
 
--- Splits on a delimiter but treats completely empty input as zero rows
+
 splitEverywhere :: Char -> String -> [String]
 splitEverywhere _    "" = []
 splitEverywhere delim s  = go s
@@ -326,7 +325,7 @@ setExcept :: CSVData -> CSVData -> CSVData
 setExcept a b   = nub [ row | row <- a, not (row `elem` b) ]
 
 
--- | Collect all the sources mentioned in a query (including sub‐queries)
+
 fromSources :: Query -> [Source]
 fromSources (BaseQuery froms _ _ _)  = froms
 fromSources (Union     q1 q2    )    = fromSources q1 ++ fromSources q2
