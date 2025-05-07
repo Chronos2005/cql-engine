@@ -1,11 +1,10 @@
 module Interpreter where
 
-import Lexer
+import Lexer ( alexScanTokens )
 import Parser hiding (fromSources)
-import System.IO
-import Data.List
-import Data.Maybe
-import Control.Monad
+import Data.List ( intercalate, nub, sort, sortBy )
+import Data.Maybe ( fromMaybe )
+import Control.Monad ( forM )
 import qualified Data.Map as Map
 import Control.Exception
 import System.IO.Error (catchIOError)
@@ -206,15 +205,41 @@ sortRows orderItems rows env =
         combineComparisons EQ next = next
         combineComparisons result _ = result
 
--- Evaluate expression for ordering
+
 evalOrderKey :: Expr -> [String] -> Env -> String
-evalOrderKey _ _ _ = ""
+evalOrderKey expr row _env =
+  case expr of
+
+    ColumnIndexRef _ idx
+      | idx >= 1 && idx <= length row -> row !! (idx - 1)
+      | otherwise                     -> ""
+
+    ColumnRef _ colStr
+      | let idx = read colStr :: Int
+      , idx >= 1 && idx <= length row -> row !! (idx - 1)
+      | otherwise                     -> ""
+
+
+    Identifier s -> s
+
+    StringLit s -> s
+    IntLit i    -> show i
+
+    FunctionCall "COALESCE" [e1, e2] ->
+      let v = evalOrderKey e1 row _env 
+      in if v /= "" then v else evalOrderKey e2 row _env
+
+    BinaryOp Plus e1 e2 ->
+      evalOrderKey e1 row _env ++ evalOrderKey e2 row _env
+
+    _ -> ""
+
 
 -- Format CSV data as a string
 formatCSV :: CSVData -> String
 formatCSV = unlines . map (intercalate "," . map escapeCSV)
   where
-    escapeCSV s = s  -- For now, no escaping since we assume no commas in entries
+    escapeCSV s = s  
 
 -- Main function to run a query
 runQuery :: String -> IO ()
@@ -246,7 +271,7 @@ padRow n xs
     | length xs >= n = xs
     | otherwise      = xs ++ replicate (n - length xs) ""
 
--- Find the maximum column index needed for each table
+
 -- Find the maximum column index needed for each table
 maxIndices :: Query -> Map.Map String Int
 

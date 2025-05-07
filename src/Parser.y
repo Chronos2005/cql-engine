@@ -72,6 +72,7 @@ Query
 SingleQuery
     : FromClause WhereClause SelectClause OrderByClause { BaseQuery $1 $2 $3 $4 }
     | FromClause WhereClause SelectClause              { BaseQuery $1 $2 $3 [] }
+    | FromClause SelectClause OrderByClause             { BaseQuery $1 Nothing $2 $3 }
     | FromClause SelectClause                          { BaseQuery $1 Nothing $2 [] }
     
 -- FROM clause specifies data sources
