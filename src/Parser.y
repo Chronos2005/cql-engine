@@ -133,8 +133,14 @@ Term : ident                                               { Identifier $1 }
 
 {
 parseError :: [Token] -> a
-parseError [] = error "Parse error: unexpected end of input"
-parseError (t:_) = error $ "Parse error at " ++ show (tokenPosn t)
+parseError [] =
+  error "Parse error: unexpected end of input"
+parseError (t:_) =
+  let pos          = tokenPosn t
+      (line, col)  = getLineCol pos
+  in  error $  "Parse error at line " 
+            ++ show line ++ ", column "
+            ++ show col ++ ": unexpected token"
 
 
 data Query
