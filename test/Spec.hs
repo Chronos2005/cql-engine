@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings, ScopedTypeVariables #-}
+{-# LANGUAGE NondecreasingIndentation #-}
 
 module Spec (spec) where
 
@@ -208,6 +209,81 @@ spec = describe "Coursework Tasks using actual tN.cql files" $ do
       writeCSV "Q.csv" ",g,h,i\n2,j,k,l"
       runTest "t5.cql" (unlines [",a,b,c"])
       clean ["P.csv", "Q.csv"]
+
+
+    describe "Task 6 - Multiway Cartesian Product" $ do
+    it "Example 1 - Provided example" $ do
+      writeCSV "P.csv" "1,2,3\n4,5,6\n7,8,9"
+      writeCSV "Q.csv" "foo,bar,baz\nbaz,qux,quux"
+      writeCSV "R.csv" "aardvark"
+      writeCSV "S.csv" "23"
+      writeCSV "T.csv" "a,b,c,d"
+      runTest "t6.cql" (unlines
+        [ "1,2,3,baz,qux,quux,aardvark,23,a,b,c,d"
+        , "1,2,3,foo,bar,baz,aardvark,23,a,b,c,d"
+        , "4,5,6,baz,qux,quux,aardvark,23,a,b,c,d"
+        , "4,5,6,foo,bar,baz,aardvark,23,a,b,c,d"
+        , "7,8,9,baz,qux,quux,aardvark,23,a,b,c,d"
+        , "7,8,9,foo,bar,baz,aardvark,23,a,b,c,d"
+        ])
+      clean ["P.csv","Q.csv","R.csv","S.csv","T.csv"]
+
+  describe "Task 7 - Paired Composition" $ do
+    it "Example 1 - Provided example" $ do
+      writeCSV "F.csv" "a,b,c\nd,e,\ng,h,i\nj,k,l"
+      writeCSV "G.csv" "b,c,d\nb,c,e\nh,,i\nk,l,\nk,l,l"
+      runTest "t7.cql" (unlines ["a,d","a,e","j,","j,l"])
+      clean ["F.csv","G.csv"]
+
+  describe "Task 8 - Right Merge on Last Column" $ do
+    it "Example 1" $ do
+      writeCSV "P.csv" ",4,5,1\n,2,,2\n2,1,7,3\n,1,8,4"
+      writeCSV "Q.csv" "7,4,6,1\n3,5,8,2\n1,,,2\n3,2,,4"
+      runTest "t8.cql" (unlines ["1,2,,2","3,2,8,4","3,5,8,2","7,4,6,1"])
+      clean ["P.csv","Q.csv"]
+    it "Example 2" $ do
+      writeCSV "P.csv" "Aaron,foo,,qux\nBrenda,,bar,quux"
+      writeCSV "Q.csv" "Ciara,bar,,quux\nAaron,,baz,qux"
+      runTest "t8.cql" (unlines ["Aaron,foo,baz,qux","Ciara,bar,bar,quux"])
+      clean ["P.csv","Q.csv"]
+    it "Example 3" $ do
+      writeCSV "P.csv" "1,6,2,3\n2,7,4,5"
+      writeCSV "Q.csv" "3,8,6,6\n4,9,5,3"
+      runTest "t8.cql" (unlines ["4,9,5,3"])
+      clean ["P.csv","Q.csv"]
+
+  describe "Task 9 - Paths of length three" $ do
+    it "Example 1" $ do
+      writeCSV "R.csv"
+        "Romsey,Eastleigh\n\
+        \Eastleigh,Southampton Airport Parkway\n\
+        \Southampton Airport Parkway,Southampton Central\n\
+        \Southampton Central,Romsey\n\
+        \Romsey, Salisbury"
+      runTest "t9.cql" (unlines
+        [ "Eastleigh,Romsey"
+        , "Romsey,Southampton Central"
+        , "Southampton Airport Parkway,Eastleigh"
+        , "Southampton Airport Parkway,Salisbury"
+        , "Southampton Central,Southampton Airport Parkway"
+        ])
+      clean ["R.csv"]
+    it "Example 2 - Single loop" $ do
+      writeCSV "R.csv" "foo,foo"
+      runTest "t9.cql" (unlines ["foo,foo"])
+      clean ["R.csv"]
+
+  describe "Task 10 - Matching Pairs" $ do
+    it "Example 1" $ do
+      writeCSV "S.csv" "A,A,B\nA,B,B\nA,B,C"
+      writeCSV "T.csv" "A,A,B\nA,B,B\nA,B,C\nC,D,D"
+      runTest "t10.cql" (unlines ["B,A","B,C"])
+      clean ["S.csv","T.csv"]
+    it "Example 2" $ do
+      writeCSV "S.csv" "A,B,B\nB,C,D\n,,"
+      writeCSV "T.csv" "B,B,B\nB,C,D\nA,,"
+      runTest "t10.cql" (unlines [",A",",B"])
+      clean ["S.csv","T.csv"]
 
 
 
