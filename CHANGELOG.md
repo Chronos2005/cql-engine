@@ -1,4 +1,4 @@
-# Changelog for `PLC-Coursework`
+# Changelog for `cql-engine`
 
 All notable changes to this project will be documented in this file.
 
