@@ -1,10 +1,10 @@
-name:       PLC-Coursework
+name:       cql-engine
 version:    0.1.0.0
-github:     "Chronos2005/PLC-Coursework"
+github:     "Chronos2005/cql-engine"
 license:    BSD-3-Clause
 author:     "Ross Aiden Melo"
 maintainer: "rossmelo2005@gmail.com"
-copyright:  "2025 Ross Aiden Melo, University of Southampton"
+copyright:  "2025 Ross Aiden Melo"
 
 extra-source-files:
 - README.md
@@ -14,7 +14,7 @@ extra-source-files:
 # synopsis: Short description of your package
 # category: Web
 
-description: Alex and Happy project.
+description: An interpreter for CQL, a custom, SQL-like query language for processing CSV files, built in Haskell using the Alex and Happy toolchains.
 
 dependencies:
 - base >= 4.7 && < 5
@@ -46,7 +46,7 @@ library:
       happy:happy
 
 executables:
-  PLC-Coursework-exe:
+  cql-engine-exe:
     main:        Main.hs
     source-dirs: app
     ghc-options:
@@ -54,10 +54,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - PLC-Coursework
+    - cql-engine
 
 tests:
-  PLC-Coursework-test:
+  cql-engine-test:
     main:        Main.hs
     source-dirs: test
     ghc-options:
@@ -65,5 +65,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - PLC-Coursework
-    
+    - cql-engine
