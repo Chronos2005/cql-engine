@@ -120,5 +120,3 @@ For a complete guide to the CQL language, including syntax, features, design rat
 
 This project is licensed under the BSD-3-Clause License. See the [LICENSE](https://www.google.com/search?q=./LICENSE) file for details.
 
-```
-```
