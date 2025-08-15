@@ -1,2 +1,2 @@
-  FROM A
-  SELECT A.1,"foo", A.1
+FROM A
+SELECT A.1,"foo", A.1
