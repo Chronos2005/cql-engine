@@ -1,0 +1,46 @@
+{
+	"scopeName": "source.myquery",
+	"name": "MyQuery",
+	"patterns": [
+	  {
+		"name": "comment.line.double-dash.myquery",
+		"match": "--.*$"
+	  },
+	  {
+		"name": "keyword.control.myquery",
+		"match": "\\b(FROM|WHERE|SELECT|AS|AND|OR|NOT|ORDER|BY|ASC|DESC|EMPTY|EXISTS|EQUALS|COALESCE|UNION|INTERSECT|EXCEPT)\\b"
+	  },
+	  {
+		"name": "constant.numeric.myquery",
+		"match": "\\b\\d+\\b"
+	  },
+	  {
+		"name": "string.quoted.double.myquery",
+		"begin": "\"",
+		"end": "\"",
+		"patterns": [
+		  {
+			"match": "\\\\.",
+			"name": "constant.character.escape.myquery"
+		  }
+		]
+	  },
+	  {
+		"name": "keyword.operator.myquery",
+		"match": "(==|!=|<=|>=|<|>|\\+|\\-|\\*|/|\\.)"
+	  },
+	  {
+		"name": "variable.other.identifier.myquery",
+		"match": "\\b[a-zA-Z_][a-zA-Z0-9_']*\\b"
+	  },
+	  {
+		"name": "punctuation.separator.myquery",
+		"match": "[,;:]"
+	  },
+	  {
+		"name": "punctuation.brackets.myquery",
+		"match": "[()]"
+	  }
+	]
+  }
+  

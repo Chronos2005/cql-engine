@@ -1,0 +1,31 @@
+{
+  "name": "ross",
+  "displayName": "myquery-syntax-highlighting",
+  "description": "Syntax highlighting for a custom SQL-like query language.",
+  "version": "0.0.1",
+  "publisher": "yourname",
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "main": "./extension.js",    
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "cql",
+        "aliases": ["myquery", "cql"],
+        "extensions": [".cql"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "cql",
+        "scopeName": "source.myquery",
+        "path": "./syntaxes/cql.tmLanguage.json"
+      }
+    ]
+  }
+}
