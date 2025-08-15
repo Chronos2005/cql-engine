@@ -1,0 +1,9 @@
+FROM F, G
+WHERE
+     F.2 != EMPTY
+ AND F.3 != EMPTY
+ AND F.2 == G.1
+ AND F.3 == G.2
+SELECT
+  F.1,
+  G.3

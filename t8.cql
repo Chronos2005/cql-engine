@@ -1,0 +1,7 @@
+FROM P, Q
+WHERE P.4 == Q.4
+SELECT
+  COALESCE(Q.1, P.1),
+  COALESCE(Q.2, P.2), 
+  COALESCE(Q.3, P.3),
+  Q.4
